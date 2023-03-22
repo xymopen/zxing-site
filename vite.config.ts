@@ -5,6 +5,7 @@ export default defineConfig(({ mode }) => {
 
 	return {
 		root: "src/",
+		base: process.env.VITE_BASE_URL,
 		build: {
 			outDir: "../dist"
 		}
