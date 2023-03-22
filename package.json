@@ -1,0 +1,31 @@
+{
+	"private": true,
+	"name": "zxing-site",
+	"version": "1.0.0",
+	"type": "module",
+	"main": "src/index.html",
+	"scripts": {
+		"dev": "vite src",
+		"build": "vite build src",
+		"preview": "vite preview src",
+		"lint": "eslint . && tsc --noEmit",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"engines": {
+		"node": ">=20.11.0"
+	},
+	"packageManager": "pnpm@8.14.0",
+	"devDependencies": {
+		"@eslint/js": "^8.56.0",
+		"@html-eslint/eslint-plugin": "^0.19.1",
+		"@html-eslint/parser": "^0.19.1",
+		"@stylistic/eslint-plugin": "^1.5.4",
+		"@types/node": "^20.11.0",
+		"@typescript-eslint/eslint-plugin": "^6.18.1",
+		"@typescript-eslint/parser": "^6.18.1",
+		"eslint": "^8.56.0",
+		"globals": "^13.19.0",
+		"typescript": "^5.2.2",
+		"vite": "^5.0.11"
+	}
+}
