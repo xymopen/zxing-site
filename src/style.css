@@ -1,0 +1,41 @@
+/** CSS by Wain. */
+body {
+	padding: 0;
+	margin: 0;
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+	background-color: #e9eef3;
+}
+
+td {
+	font-size: 14px;
+}
+
+#header {
+	background-color: #dde3e9;
+	border-bottom: 1px solid #f2f7fc;
+}
+
+#header h1 {
+	padding: 12px;
+	margin: 0;
+	font-size: 15px;
+	font-weight: bold;
+	border-bottom: 1px solid #c8d0d9;
+}
+
+#header span {
+	font-weight: normal;
+	color: #5e6b75;
+}
+
+#footer {
+	width: 100%;
+	padding-top: 12px;
+	text-align: center;
+}
+
+#footer a {
+	color: #5e6b75;
+	text-decoration: none;
+}

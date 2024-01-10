@@ -1,0 +1,60 @@
+body {
+	padding: 10px 0 0 0;
+	margin: 0;
+	text-align: center;
+	background-color: white;
+}
+
+body,
+th,
+td,
+p {
+	font-family: Arial, sans-serif;
+}
+
+div#main {
+	width: 800px;
+	padding: 0;
+	margin: 0 auto;
+	text-align: left;
+	border: 0;
+}
+
+td {
+	vertical-align: top;
+}
+
+table#upload td {
+	height: 30px;
+	padding: 12px;
+	background-color: #dde3e9;
+}
+
+table#result {
+	width: 100%;
+}
+
+table#result td {
+	background-color: #dde3e9;
+}
+
+table#result pre {
+	margin: 0;
+}
+
+#header {
+	background-color: #dde3e9;
+	border-bottom: 1px solid #dde3e9;
+}
+
+#header h1 {
+	padding: 12px;
+	margin: 0;
+	font-size: 24px;
+}
+
+img#icon {
+	width: 32px;
+	height: 32px;
+	vertical-align: middle;
+}

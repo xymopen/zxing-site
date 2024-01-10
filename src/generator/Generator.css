@@ -1,0 +1,119 @@
+/** CSS by Wain. */
+body {
+	padding: 0;
+	margin: 0;
+	font-family: Arial, sans-serif;
+	font-size: 11px;
+	background-color: #e9eef3;
+}
+
+#header {
+	background-color: #dde3e9;
+	border-bottom: 1px solid #f2f7fc;
+}
+
+#header h1 {
+	padding: 12px;
+	margin: 0;
+	font-size: 15px;
+	font-weight: bold;
+	border-bottom: 1px solid #c8d0d9;
+}
+
+#header span {
+	font-weight: normal;
+	color: #5e6b75;
+}
+
+#footer {
+	width: 100%;
+	padding-top: 12px;
+	text-align: center;
+}
+
+#footer a {
+	color: #5e6b75;
+	text-decoration: none;
+}
+
+/****************************************/
+#mainpanel {
+	width: 800px;
+	padding: 12px;
+	margin: 0 auto;
+	font-size: 11px;
+}
+
+#imageresult {
+
+	position: relative;
+	display: table;
+	width: 350px;
+	height: 350px;
+	padding: 10px;
+	text-align: center;
+	vertical-align: middle;
+	background-color: #dde3e9;
+}
+
+#innerresult {
+	display: table-cell;
+	width: 100%;
+	vertical-align: middle;
+}
+
+#downloadText {
+	font-size: 11px;
+}
+
+#urlresult {
+	width: 350px;
+}
+
+#rawtextresult {
+	width: 350px;
+}
+
+.firstColumn {
+	width: 100px;
+	padding: 4px 0 4px 0;
+	font-size: 11px;
+	font-weight: bold;
+	color: #5e6b75;
+	text-align: right;
+	vertical-align: top;
+}
+
+.secondColumn {
+	width: 270px;
+	font-size: 11px;
+	font-weight: bold;
+	color: #5e6b75;
+}
+
+/*.inputfield,*/
+.gwt-TextBox,
+.gwt-TextArea {
+	width: 256px;
+	padding: 4px;
+	font-family: Arial, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #000;
+	border: 1px solid #c8d0d9;
+}
+
+/*.inputfield:focus,*/
+.gwt-TextBox:focus {
+	background-color: #fffbcc;
+}
+
+.required {
+	background: #ffffff url(./required-field-bg.png) repeat-y;
+}
+
+.errorMessage {
+	padding-left: 110px;
+	font-size: 11px;
+	color: red;
+}
