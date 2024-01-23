@@ -6,6 +6,11 @@ import typescript from "@typescript-eslint/eslint-plugin";
 import typescriptParser from "@typescript-eslint/parser";
 import html from "@html-eslint/eslint-plugin";
 import htmlParser from "@html-eslint/parser";
+import react from "eslint-plugin-react";
+import reactRecommended from "eslint-plugin-react/configs/recommended.js";
+import reactJsxRuntime from "eslint-plugin-react/configs/jsx-runtime.js";
+import hooks from "eslint-plugin-react-hooks";
+import refresh from "eslint-plugin-react-refresh";
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
@@ -28,7 +33,12 @@ export default [
 		],
 		languageOptions: {
 			ecmaVersion: 2020,
-			sourceType: "module"
+			sourceType: "module",
+			parserOptions: {
+				ecmaFeatures: {
+					jsx: true
+				}
+			}
 		},
 		plugins: {
 			"@stylistic": stylistic
@@ -64,12 +74,35 @@ export default [
 			"src/**/*.js",
 			"src/**/*.mjs",
 			"src/**/*.cjs",
+			"src/**/*.jsx",
 			"src/**/*.ts",
 			"src/**/*.mts",
-			"src/**/*.cts"
+			"src/**/*.cts",
+			"src/**/*.tsx"
 		],
+		...reactRecommended,
+		...reactJsxRuntime,
+		...hooks.configs.recommended,
 		languageOptions: {
 			globals: globals.browser
+		},
+		plugins: {
+			react,
+			"react-refresh": refresh
+		},
+		rules: {
+			"react/jsx-no-target-blank": "off",
+			"react-refresh/only-export-components": [
+				"warn",
+				{
+					allowConstantExport: true
+				}
+			]
+		},
+		settings: {
+			react: {
+				version: "18.2"
+			}
 		}
 	},
 	{
@@ -89,7 +122,8 @@ export default [
 		files: [
 			"**/*.js",
 			"**/*.mjs",
-			"**/*.cjs"
+			"**/*.cjs",
+			"**/*.jsx"
 		],
 		...js.configs.recommended
 	},
@@ -97,7 +131,8 @@ export default [
 		files: [
 			"**/*.ts",
 			"**/*.mts",
-			"**/*.cts"
+			"**/*.cts",
+			"**/*.tsx"
 		],
 		languageOptions: {
 			parser: typescriptParser,

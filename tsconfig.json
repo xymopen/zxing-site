@@ -26,7 +26,7 @@
 			"DOM.Iterable"
 		],
 		/* Specify what JSX code is generated. */
-		// "jsx": "preserve",
+		"jsx": "react-jsx",
 		/* Enable experimental support for legacy experimental decorators. */
 		// "experimentalDecorators": true,
 		/* Emit design-type metadata for decorated declarations in source files. */

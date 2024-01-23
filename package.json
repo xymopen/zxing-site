@@ -15,6 +15,10 @@
 		"node": ">=20.11.0"
 	},
 	"packageManager": "pnpm@8.14.0",
+	"dependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	},
 	"devDependencies": {
 		"@eslint/js": "^8.56.0",
 		"@html-eslint/eslint-plugin": "^0.19.1",
@@ -23,9 +27,15 @@
 		"@stylistic/stylelint-config": "^1.0.1",
 		"@stylistic/stylelint-plugin": "^2.0.0",
 		"@types/node": "^20.11.0",
+		"@types/react": "^18.2.47",
+		"@types/react-dom": "^18.2.18",
 		"@typescript-eslint/eslint-plugin": "^6.18.1",
 		"@typescript-eslint/parser": "^6.18.1",
+		"@vitejs/plugin-react": "^4.2.1",
 		"eslint": "^8.56.0",
+		"eslint-plugin-react": "^7.33.2",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"eslint-plugin-react-refresh": "^0.4.5",
 		"globals": "^13.19.0",
 		"stylelint": "16.1.0",
 		"stylelint-config-recess-order": "^4.4.0",
