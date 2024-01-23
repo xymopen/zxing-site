@@ -1,0 +1,32 @@
+{
+	"extends": [
+		"stylelint-config-recommended",
+		"stylelint-config-recess-order",
+		"@stylistic/stylelint-config"
+	],
+	"ignoreFiles": [
+		"logs",
+		"pids",
+		"lib-cov",
+		"coverage",
+		".nyc_output",
+		"build/Release",
+		"node_modules/",
+		".npm",
+		".eslintcache",
+		".vite/",
+		"dist/",
+		".yarn/cache",
+		".yarn/unplugged",
+		".pnp.*"
+	],
+	"plugins": [
+		"@stylistic/stylelint-plugin"
+	],
+	"rules": {
+		"@stylistic/indentation": "tab",
+		"@stylistic/no-eol-whitespace": true,
+		"@stylistic/no-missing-end-of-source-newline": true,
+		"@stylistic/string-quotes": "double"
+	}
+}

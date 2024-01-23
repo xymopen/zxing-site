@@ -8,7 +8,7 @@
 		"dev": "vite src",
 		"build": "vite build src",
 		"preview": "vite preview src",
-		"lint": "eslint . && tsc --noEmit",
+		"lint": "eslint . && tsc --noEmit && stylelint \"**/*.css\"",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"engines": {
@@ -20,11 +20,16 @@
 		"@html-eslint/eslint-plugin": "^0.19.1",
 		"@html-eslint/parser": "^0.19.1",
 		"@stylistic/eslint-plugin": "^1.5.4",
+		"@stylistic/stylelint-config": "^1.0.1",
+		"@stylistic/stylelint-plugin": "^2.0.0",
 		"@types/node": "^20.11.0",
 		"@typescript-eslint/eslint-plugin": "^6.18.1",
 		"@typescript-eslint/parser": "^6.18.1",
 		"eslint": "^8.56.0",
 		"globals": "^13.19.0",
+		"stylelint": "16.1.0",
+		"stylelint-config-recess-order": "^4.4.0",
+		"stylelint-config-recommended": "^14.0.0",
 		"typescript": "^5.2.2",
 		"vite": "^5.0.11"
 	}
