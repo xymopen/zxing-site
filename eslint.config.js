@@ -98,7 +98,6 @@ export default [
 			"**/*.mts",
 			"**/*.cts"
 		],
-		...typescript.configs["recommended-type-checked"],
 		languageOptions: {
 			parser: typescriptParser,
 			/** @type {import('@typescript-eslint/parser/dist/index').ParserOptions} */
@@ -109,6 +108,10 @@ export default [
 		},
 		plugins: {
 			"@typescript-eslint": typescript
+		},
+		rules: {
+			...typescript.configs["eslint-recommended"].rules,
+			...typescript.configs["recommended-type-checked"].rules,
 		}
 	},
 	{
