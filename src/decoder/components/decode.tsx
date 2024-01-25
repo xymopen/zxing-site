@@ -59,7 +59,7 @@ function Decode() {
 						<li>Data Matrix</li>
 						<li>Aztec</li>
 						<li>PDF 417</li>
-						<li>MaxiCode</li>
+						<li><del>MaxiCode</del></li>
 					</ul>
 				</td>
 			</tr>
