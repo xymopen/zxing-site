@@ -24,7 +24,7 @@ td {
 	vertical-align: top;
 }
 
-table#upload td {
+table.upload td {
 	height: 30px;
 	padding: 12px;
 	background-color: #dde3e9;

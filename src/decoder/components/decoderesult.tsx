@@ -31,36 +31,38 @@ function DecodeResult() {
 		</Helmet>
 
 		<table id="result">
-			<tr>
-				<td>Raw text</td>
-				<td>
-					<pre>{"${text}"}</pre>
-				</td>
-			</tr>
-			<tr>
-				<td>Raw bytes</td>
-				<td>
-					<pre>{"${rawBytesString}"}</pre>
-				</td>
-			</tr>
-			<tr>
-				<td>Barcode format</td>
-				<td>
-					{"${result.barcodeFormat}"}
-				</td>
-			</tr>
-			<tr>
-				<td>Parsed Result Type</td>
-				<td>
-					{"${parsedResult.type}"}
-				</td>
-			</tr>
-			<tr>
-				<td>Parsed Result</td>
-				<td>
-					<pre>{"${displayResult}"}</pre>
-				</td>
-			</tr>
+			<tbody>
+				<tr>
+					<td>Raw text</td>
+					<td>
+						<pre>{"${text}"}</pre>
+					</td>
+				</tr>
+				<tr>
+					<td>Raw bytes</td>
+					<td>
+						<pre>{"${rawBytesString}"}</pre>
+					</td>
+				</tr>
+				<tr>
+					<td>Barcode format</td>
+					<td>
+						{"${result.barcodeFormat}"}
+					</td>
+				</tr>
+				<tr>
+					<td>Parsed Result Type</td>
+					<td>
+						{"${parsedResult.type}"}
+					</td>
+				</tr>
+				<tr>
+					<td>Parsed Result</td>
+					<td>
+						<pre>{"${displayResult}"}</pre>
+					</td>
+				</tr>
+			</tbody>
 		</table>
 	</Layout>;
 }
