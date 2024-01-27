@@ -1,5 +1,6 @@
 import { ReactNode, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { Result } from "@zxing/library";
 import DecodeResult from "../components/decoderesult";
 import Response from "../components/response";
 
@@ -15,7 +16,7 @@ if (import.meta.hot) {
 	});
 }
 
-export const setDecodeResult = (): void => render(<DecodeResult />);
+export const setDecodeResult = (results: Result[]): void => render(<DecodeResult results={results} />);
 
 const error = {
 	badimage: {

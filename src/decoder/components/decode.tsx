@@ -15,10 +15,17 @@
  */
 
 import zxingicon from "../../zxingicon.png";
+import { FormEvent, useCallback } from "react";
 import { Helmet } from "react-helmet";
 import Layout from "./layout";
+import processFormData from "../lib/decode";
 
 function Decode() {
+	const submit = useCallback((event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		void processFormData(new FormData(event.target as HTMLFormElement));
+	}, []);
+
 	return <Layout {...{
 		slots: {
 			header: <><img src={zxingicon} id="icon" alt="" /> ZXing Decoder Online</>
@@ -67,29 +74,13 @@ function Decode() {
 			</tbody>
 		</table>
 
-		<form action="./decoderesult.html" method="get">
-			<table className="upload">
+		{/** TODO: Use form action on later React.js update */}
+		<form action="javascript:void(0)" onSubmit={submit}>
+			<table id="upload">
 				<tbody>
 					<tr>
 						<td style={{ textAlign: "right" }}>
-							Enter an <label htmlFor="u">image URL</label>:
-						</td>
-						<td>
-							<input type="text" size={80} name="u" id="u" />
-						</td>
-						<td>
-							<input type="submit" />
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-		<form action="./decoderesult.html" method="post" encType="multipart/form-data">
-			<table className="upload">
-				<tbody>
-					<tr>
-						<td style={{ textAlign: "right" }}>
-							Or <label htmlFor="f">upload a file</label> (&lt;10MB, &lt;10MP):
+							<label htmlFor="f">Upload a file</label> (&lt;10MB, &lt;10MP):
 						</td>
 						<td>
 							<input type="file" name="f" id="f" />

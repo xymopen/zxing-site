@@ -24,22 +24,22 @@ td {
 	vertical-align: top;
 }
 
-table.upload td {
-	height: 30px;
-	padding: 12px;
-	background-color: #dde3e9;
-}
-
-table#result {
+table.result {
 	width: 100%;
 }
 
-table#result td {
+table.result td {
 	background-color: #dde3e9;
 }
 
-table#result pre {
+table.result pre {
 	margin: 0;
+}
+
+table#upload td {
+	height: 30px;
+	padding: 12px;
+	background-color: #dde3e9;
 }
 
 #header {

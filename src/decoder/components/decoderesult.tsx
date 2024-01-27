@@ -18,8 +18,31 @@ import zxingicon from "../../zxingicon.png";
 import { Helmet } from "react-helmet";
 import Layout from "./layout";
 import "./decoderesult.css";
+import { BarcodeFormat, Result } from "@zxing/library";
 
-function DecodeResult() {
+const BYTES_PER_LINE = 16;
+const HALF_BYTES_PER_LINE = BYTES_PER_LINE / 2;
+
+const arrayToString = (bytes: Uint8Array): string => {
+	let result = "";
+
+	for (let i = 0; i < bytes.length; i += 1) {
+		result += bytes[i].toString(16).padStart(2, "0");
+		if ((i + 1) % BYTES_PER_LINE == 0) {
+			result += "\n";
+		} else if ((i + 1) % HALF_BYTES_PER_LINE == 0) {
+			result += "   ";
+		} else {
+			result += " ";
+		}
+	}
+
+	return result;
+};
+
+function DecodeResult(props: {
+	results: Result[]
+}) {
 	return <Layout {...{
 		slots: {
 			header: <><img src={zxingicon} id="icon" alt="" /> Decode Succeeded</>
@@ -30,40 +53,49 @@ function DecodeResult() {
 			<title>Decode Succeeded</title>
 		</Helmet>
 
-		<table id="result">
-			<tbody>
-				<tr>
-					<td>Raw text</td>
-					<td>
-						<pre>{"${text}"}</pre>
-					</td>
-				</tr>
-				<tr>
-					<td>Raw bytes</td>
-					<td>
-						<pre>{"${rawBytesString}"}</pre>
-					</td>
-				</tr>
-				<tr>
-					<td>Barcode format</td>
-					<td>
-						{"${result.barcodeFormat}"}
-					</td>
-				</tr>
-				<tr>
-					<td>Parsed Result Type</td>
-					<td>
-						{"${parsedResult.type}"}
-					</td>
-				</tr>
-				<tr>
-					<td>Parsed Result</td>
-					<td>
-						<pre>{"${displayResult}"}</pre>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		{props.results.map(result => {
+			const text = result.getText() ?? "(Not applicable)";
+			const rawBytes = result.getRawBytes();
+			const rawBytesString = rawBytes != null ? arrayToString(rawBytes) : "(Not applicable)";
+			// TODO: const parsedResult = ResultParser.parseResult(result);
+			// TODO: const displayResult = ResultParser.parseResult(result).getDisplayResult() ?? "(Not applicable)";
+
+			return <table className="result">
+				<tbody>
+					<tr>
+						<td>Raw text</td>
+						<td>
+							<pre>{text}</pre>
+						</td>
+					</tr>
+					<tr>
+						<td>Raw bytes</td>
+						<td>
+							<pre>{rawBytesString}</pre>
+						</td>
+					</tr>
+					<tr>
+						<td>Barcode format</td>
+						<td>
+							{BarcodeFormat[result.getBarcodeFormat()]}
+						</td>
+					</tr>
+					{/* <tr>
+						<td>Parsed Result Type</td>
+						<td>
+							{parsedResult.getType()}
+						</td>
+					</tr>
+					<tr>
+						<td>Parsed Result</td>
+						<td>
+							<pre>{displayResult}</pre>
+						</td>
+					</tr> */}
+				</tbody>
+			</table>;
+		})}
+
 	</Layout>;
 }
 
