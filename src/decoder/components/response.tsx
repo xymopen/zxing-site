@@ -18,19 +18,22 @@ import zxingicon from "../../zxingicon.png";
 import { Helmet } from "react-helmet";
 import Layout from "./layout";
 
-function Response() {
+function Response(props: {
+	title: string;
+	text: string;
+}) {
 	return <Layout {...{
 		slots: {
-			header: <><img src={zxingicon} id="icon" alt="" /> {"${requestScope['title']}"}</>
+			header: <><img src={zxingicon} id="icon" alt="" /> {props.title}</>
 		}
 	}}>
 		<Helmet>
 			<title>
-				{"${requestScope['title']}"}
+				{props.title}
 			</title>
 		</Helmet>
 
-		<p>{"${requestScope['text']}"}</p>
+		<p>{props.text}</p>
 	</Layout>;
 }
 
