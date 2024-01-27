@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
 		root: "src/",
 		base: process.env.VITE_BASE_URL,
 		build: {
+			emptyOutDir: true,
 			outDir: "../dist",
 			rollupOptions: {
 			  input: {
