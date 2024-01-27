@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
 			  input: {
 				index: resolve(import.meta.dirname, 'src/index.html'),
 				decoder: resolve(import.meta.dirname, 'src/decoder/index.html'),
-				generator: resolve(import.meta.dirname, 'src/generator/Generator.html')
+				generator: resolve(import.meta.dirname, 'src/generator/index.html')
 			  }
 			}
 		},
