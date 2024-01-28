@@ -14,7 +14,49 @@
  * limitations under the License.
  */
 
+import { useState } from "react";
+import ContactInfoGenerator from "./ContactInfoGenerator";
+import EmailGenerator from "./EmailGenerator";
+import GeoLocationGenerator from "./GeoLocationGenerator";
+import PhoneNumberGenerator from "./PhoneNumberGenerator";
+import SmsAddressGenerator from "./SmsAddressGenerator";
+import TextGenerator from "./TextGenerator";
+import UrlGenerator from "./UrlGenerator";
+import WifiGenerator from "./WifiGenerator";
+
+const generators = [
+	ContactInfoGenerator,
+	EmailGenerator,
+	GeoLocationGenerator,
+	PhoneNumberGenerator,
+	SmsAddressGenerator,
+	TextGenerator,
+	UrlGenerator,
+	WifiGenerator,
+];
+
+type GeneratorKey = (typeof generators)[number]["key"];
+
+const generatorMap = new Map(generators.map((generator) => [generator.key, generator]));
+
 function LeftPanel() {
+	const [selectedGeneratorKey, setSelectedGeneratorKey] = useState(() => generators[0].key as GeneratorKey);
+
+	// fills up the list of generators
+	const genList = <select
+		className="gwt-ListBox"
+		value={selectedGeneratorKey}
+		onChange={event => {
+			// updates the second row of the table with the content of the selected generator
+			setSelectedGeneratorKey(event.target.value as GeneratorKey);
+		}}
+	>
+		{generators.map((generator) => {
+			const widget = <option key={generator.key} value={generator.key}>{generator.key}</option>;
+			return widget;
+		})}
+	</select>;
+
 	const sizeList = <select className="gwt-ListBox" value={350}>
 		<option value={120}>Small</option>
 		<option value={230}>Medium</option>
@@ -39,7 +81,7 @@ function LeftPanel() {
 		<tbody>
 			<tr>
 				<td className="firstColumn">Contents</td>
-				<td className="secondColumn"><></></td>
+				<td className="secondColumn">{genList}</td>
 			</tr>
 		</tbody>
 	</table>;
@@ -73,6 +115,7 @@ function LeftPanel() {
 		</tbody>
 	</table>;
 
+	const SelectedGenerator = generatorMap.get(selectedGeneratorKey)!;
 
 	const topPanel = <table id="leftpanel">
 		<tbody>
@@ -80,7 +123,7 @@ function LeftPanel() {
 				<td>{selectionTable}</td>
 			</tr>
 			<tr>
-				<td><></></td>
+				<td><SelectedGenerator /></td>
 			</tr>
 			<tr>
 				<td><span id="errorMessageID" className="errorMessage"></span></td>
