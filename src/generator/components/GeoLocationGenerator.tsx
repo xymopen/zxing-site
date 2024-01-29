@@ -14,7 +14,36 @@
  * limitations under the License.
  */
 
-function GeoLocationGenerator() {
+import { ForwardedRef, forwardRef, useEffect, useRef } from "react";
+import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
+import setForwardRef from "../lib/set-forward-ref";
+
+const GeoLocationGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
+	const focusTargetRef = useRef<HTMLInputElement>(null);
+	const focusRequested = useRef(false);
+
+	useEffect(() => {
+		setForwardRef(forwardRef, {
+			submit() {
+
+			},
+			focus() {
+				focusRequested.current = true;
+			}
+		});
+	}, [
+		forwardRef,
+		props.onInvalid,
+		props.onSubmit
+	]);
+
+	useEffect(() => {
+		if (focusRequested.current && focusTargetRef.current != null) {
+			focusTargetRef.current.focus();
+			focusRequested.current = false;
+		}
+	}, [focusTargetRef]);
+
 	return <table>
 		<tbody>
 			<tr>
@@ -22,7 +51,7 @@ function GeoLocationGenerator() {
 					Latitude
 				</td>
 				<td className="secondColumn">
-					<input className="gwt-TextBox required" type="text" />
+					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" />
 				</td>
 			</tr>
 			<tr>
@@ -43,7 +72,7 @@ function GeoLocationGenerator() {
 			</tr>
 		</tbody>
 	</table>;
-};
+});
 
 const key = "Geo location" as const;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ContactInfoGenerator from "./ContactInfoGenerator";
 import EmailGenerator from "./EmailGenerator";
 import GeoLocationGenerator from "./GeoLocationGenerator";
@@ -23,6 +23,7 @@ import SmsAddressGenerator from "./SmsAddressGenerator";
 import TextGenerator from "./TextGenerator";
 import UrlGenerator from "./UrlGenerator";
 import WifiGenerator from "./WifiGenerator";
+import { GeneratorRef } from "../types/generator-types";
 
 const generators = [
 	ContactInfoGenerator,
@@ -39,17 +40,51 @@ type GeneratorKey = (typeof generators)[number]["key"];
 
 const generatorMap = new Map(generators.map((generator) => [generator.key, generator]));
 
-function LeftPanel() {
+function LeftPanel(props: {
+	setBarcode: (url: string, text: string) => void;
+	invalidateBarcode: () => void;
+}) {
 	const [selectedGeneratorKey, setSelectedGeneratorKey] = useState(() => generators[0].key as GeneratorKey);
+	const focusRequest = useRef(true);
+	const selectedGeneratorRef = useRef<GeneratorRef>(null);
+	const [errorMessage, setErrorMessage] = useState("");
+
+	const setErrorMessageAndInvalidateBarcode = useCallback((value: string) => {
+		setErrorMessage(value);
+		props.invalidateBarcode();
+	}, [
+		setErrorMessage,
+		props.invalidateBarcode
+	]);
+
+	const generate = useCallback(() => {
+		selectedGeneratorRef.current?.submit();
+	},[selectedGeneratorRef]);
+
+	const setSelectedGeneratorKeyAndFocus: React.ChangeEventHandler<HTMLSelectElement> = useCallback(event => {
+		// updates the second row of the table with the content of the selected generator
+		setSelectedGeneratorKey(event.target.value as GeneratorKey);
+		setErrorMessage("");
+		props.invalidateBarcode();
+		focusRequest.current = true;
+	}, [
+		setSelectedGeneratorKey,
+		setErrorMessage,
+		props.invalidateBarcode
+	]);
+
+	useEffect(() => {
+		if (focusRequest.current && selectedGeneratorRef.current != null) {
+			selectedGeneratorRef.current.focus();
+			focusRequest.current = false;
+		}
+	}, [selectedGeneratorRef.current]);
 
 	// fills up the list of generators
 	const genList = <select
 		className="gwt-ListBox"
 		value={selectedGeneratorKey}
-		onChange={event => {
-			// updates the second row of the table with the content of the selected generator
-			setSelectedGeneratorKey(event.target.value as GeneratorKey);
-		}}
+		onChange={setSelectedGeneratorKeyAndFocus}
 	>
 		{generators.map((generator) => {
 			const widget = <option key={generator.key} value={generator.key}>{generator.key}</option>;
@@ -57,20 +92,47 @@ function LeftPanel() {
 		})}
 	</select>;
 
-	const sizeList = <select className="gwt-ListBox" value={350}>
+	type SizeType = 120 | 230 | 350;
+	const [size, setSize] = useState<SizeType>(350);
+	const sizeList = <select
+		className="gwt-ListBox"
+		value={size}
+		onChange={useCallback<React.ChangeEventHandler<HTMLSelectElement>>(
+			event => setSize(Number(event.target.value) as SizeType),
+			[setSize]
+		)}
+	>
 		<option value={120}>Small</option>
 		<option value={230}>Medium</option>
 		<option value={350}>Large</option>
 	</select>;
 
-	const ecLevelList = <select className="gwt-ListBox" value="L">
+	type EcLevelType = "L" | "M" | "Q" | "H";
+	const [ecLevel, setEcLevel] = useState<EcLevelType>("L");
+	const ecLevelList = <select
+		className="gwt-ListBox"
+		value={ecLevel}
+		onChange={useCallback<React.ChangeEventHandler<HTMLSelectElement>>(
+			event => setEcLevel(event.target.value as EcLevelType),
+			[setEcLevel]
+		)}
+	>
 		<option value="L">L</option>
 		<option value="M">M</option>
 		<option value="Q">Q</option>
 		<option value="H">H</option>
 	</select>;
 
-	const encodingList = <select className="gwt-ListBox" value="UTF-8">
+	type EncodingType = "UTF-8" | "ISO-8859-1" | "Shift_JIS";
+	const [encoding, setEncoding] = useState<EncodingType>("UTF-8");
+	const encodingList = <select
+		className="gwt-ListBox"
+		value={encoding}
+		onChange={useCallback<React.ChangeEventHandler<HTMLSelectElement>>(
+			event => setEncoding(event.target.value as EncodingType),
+			[setEncoding]
+		)}
+	>
 		<option value="UTF-8">UTF-8</option>
 		<option value="ISO-8859-1">ISO-8859-1</option>
 		<option value="Shift_JIS">Shift_JIS</option>
@@ -86,13 +148,26 @@ function LeftPanel() {
 		</tbody>
 	</table>;
 
+	const setRawText = useCallback((text: string) => {
+		setErrorMessage("");
+		// const url = getUrl(size, size, ecLevel, encoding, text);
+		// props.setBarcode(url, text);
+	}, [
+		size,
+		size,
+		ecLevel,
+		encoding,
+		props.invalidateBarcode,
+		props.setBarcode
+	]);
+
 	// grid for the generate button
 	const generateGrid = <table>
 		<tbody>
 			<tr>
 				<td className="firstColumn" />
 				<td className="secondColumn">
-					<button className="gwt-Button">Generate &rarr;</button>
+					<button className="gwt-Button" onClick={generate}>Generate &rarr;</button>
 				</td>
 			</tr>
 		</tbody>
@@ -123,10 +198,10 @@ function LeftPanel() {
 				<td>{selectionTable}</td>
 			</tr>
 			<tr>
-				<td><SelectedGenerator /></td>
+				<td><SelectedGenerator ref={selectedGeneratorRef} onInvalid={setErrorMessageAndInvalidateBarcode} onSubmit={setRawText} /></td>
 			</tr>
 			<tr>
-				<td><span id="errorMessageID" className="errorMessage"></span></td>
+				<td><span id="errorMessageID" className="errorMessage">{errorMessage}</span></td>
 			</tr>
 			<tr>
 				<td>{configTable}</td>

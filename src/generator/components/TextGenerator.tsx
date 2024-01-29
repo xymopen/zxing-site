@@ -14,7 +14,36 @@
  * limitations under the License.
  */
 
-function TextGenerator() {
+import { ForwardedRef, forwardRef, useEffect, useRef } from "react";
+import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
+import setForwardRef from "../lib/set-forward-ref";
+
+const TextGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
+	const focusTargetRef = useRef<HTMLTextAreaElement>(null);
+	const focusRequested = useRef(false);
+
+	useEffect(() => {
+		setForwardRef(forwardRef, {
+			submit() {
+
+			},
+			focus() {
+				focusRequested.current = true;
+			}
+		});
+	}, [
+		forwardRef,
+		props.onInvalid,
+		props.onSubmit
+	]);
+
+	useEffect(() => {
+		if (focusRequested.current && focusTargetRef.current != null) {
+			focusTargetRef.current.focus();
+			focusRequested.current = false;
+		}
+	}, [focusTargetRef]);
+
 	return <table>
 		<tbody>
 			<tr>
@@ -22,12 +51,12 @@ function TextGenerator() {
 					Text content
 				</td>
 				<td className="secondColumn">
-					<textarea className="gwt-TextArea required" rows={5} />
+					<textarea ref={focusTargetRef} className="gwt-TextArea required" rows={5} />
 				</td>
 			</tr>
 		</tbody>
 	</table>;
-};
+});
 
 const key = "Text" as const;
 

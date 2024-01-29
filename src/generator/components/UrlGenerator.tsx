@@ -14,7 +14,36 @@
  * limitations under the License.
  */
 
-function UrlGenerator() {
+import { ForwardedRef, forwardRef, useEffect, useRef } from "react";
+import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
+import setForwardRef from "../lib/set-forward-ref";
+
+const UrlGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
+	const focusTargetRef = useRef<HTMLInputElement>(null);
+	const focusRequested = useRef(false);
+
+	useEffect(() => {
+		setForwardRef(forwardRef, {
+			submit() {
+
+			},
+			focus() {
+				focusRequested.current = true;
+			}
+		});
+	}, [
+		forwardRef,
+		props.onInvalid,
+		props.onSubmit
+	]);
+
+	useEffect(() => {
+		if (focusRequested.current && focusTargetRef.current != null) {
+			focusTargetRef.current.focus();
+			focusRequested.current = false;
+		}
+	}, [focusTargetRef]);
+
 	return <table>
 		<tbody>
 			<tr>
@@ -22,12 +51,12 @@ function UrlGenerator() {
 					URL
 				</td>
 				<td className="secondColumn">
-					<input className="gwt-TextBox required" type="text" value="http://" />
+					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" value="http://" />
 				</td>
 			</tr>
 		</tbody>
 	</table>;
-};
+});
 
 const key = "URL" as const;
 
