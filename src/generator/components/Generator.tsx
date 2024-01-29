@@ -18,28 +18,12 @@ import { useCallback, useState } from "react";
 import LeftPanel from "./LeftPanel";
 
 function Generator() {
-	const [result, setResult] = useState("");
+	const [svg, setSvg] = useState<SVGSVGElement | null>(null);
 
-	const [resultVisible, setResultVisible] = useState(false);
 	const div = <div id="imageresult">
-		<div id="innerresult">
-			<img
-				className="gwt-Image"
-				src={result}
-				style={resultVisible ? {} : { display: "none" }}
-			/>
+		<div id="innerresult" dangerouslySetInnerHTML={{ __html: svg?.outerHTML ?? "" }}>
 		</div>
 	</div>;
-
-	const [urlResultVisible, setUrlResultVisible] = useState(false);
-	const urlResult = <input
-		id="urlresult"
-		className="gwt-TextBox"
-		type="text"
-		readOnly={true}
-		value={result}
-		style={urlResultVisible ? {} : { display: "none" }}
-	/>;
 
 	const [rawTextResultText, setRawTextResultText] = useState("");
 	const [rawTextResultVisible, setRawTextResultVisible] = useState(false);
@@ -53,49 +37,31 @@ function Generator() {
 		style={rawTextResultVisible ? {} : { display: "none" }}
 	/>;
 
-	const [downloadTextVisible, setDownloadTextVisible] = useState(false);
-	const downloadText = <div id="downloadText" className="gwt-HTML" style={downloadTextVisible ? {} : { display: "none" }}>
-		<a href={result} id="downloadlink" >Download</a> or embed with this URL:
-	</div>;
 	const rightPanel = <table>
 		<tbody>
 			<tr><td align="left" style={{ verticalAlign: "top" }}>{div}</td></tr>
-			<tr><td align="left" style={{ verticalAlign: "top" }}>{downloadText}</td></tr>
-			<tr><td align="left" style={{ verticalAlign: "top" }}>{urlResult}</td></tr>
 			<tr><td align="left" style={{ verticalAlign: "top" }}>{rawTextResult}</td></tr>
 		</tbody>
 	</table>;
 
-	const setBarcode = useCallback((url: string, text: string) => {
-		setResult(url);
-		setResultVisible(true);
-		setUrlResultVisible(true);
+	const setBarcode = useCallback((svg: SVGSVGElement, text: string) => {
+		setSvg(svg);
 		setRawTextResultText(text);
 		setRawTextResultVisible(true);
-		setDownloadTextVisible(true);
 	}, [
-		setResult,
-		setResultVisible,
-		setUrlResultVisible,
+		setSvg,
 		setRawTextResultText,
-		setRawTextResultVisible,
-		setDownloadTextVisible
+		setRawTextResultVisible
 	]);
 
 	const invalidateBarcode = useCallback(() => {
-		setResult("");
-		setResultVisible(false);
-		setUrlResultVisible(false);
+		setSvg(null);
 		setRawTextResultText("");
 		setRawTextResultVisible(false);
-		setDownloadTextVisible(false);
 	}, [
-		setResult,
-		setResultVisible,
-		setUrlResultVisible,
+		setSvg,
 		setRawTextResultText,
-		setRawTextResultVisible,
-		setDownloadTextVisible
+		setRawTextResultVisible
 	]);
 
 	const topPanel = <LeftPanel setBarcode={setBarcode} invalidateBarcode={invalidateBarcode} />;

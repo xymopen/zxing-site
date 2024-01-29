@@ -15,6 +15,9 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { EncodeHintType } from "@zxing/library";
+import ErrorCorrectionLevel from "@zxing/library/esm/core/qrcode/decoder/ErrorCorrectionLevel";
+import { BrowserQRCodeSvgWriter } from "@zxing/browser";
 import ContactInfoGenerator from "./ContactInfoGenerator";
 import EmailGenerator from "./EmailGenerator";
 import GeoLocationGenerator from "./GeoLocationGenerator";
@@ -40,8 +43,26 @@ type GeneratorKey = (typeof generators)[number]["key"];
 
 const generatorMap = new Map(generators.map((generator) => [generator.key, generator]));
 
+const createSvg = (sizeX: number, sizeY: number, ecLevel: string, encoding: string, content: string): SVGSVGElement => {
+	const margin = 4;
+
+	const codeWriter = new BrowserQRCodeSvgWriter();
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const hints = new Map<EncodeHintType, any>();
+
+	hints.set(EncodeHintType.MARGIN, margin);
+	if (encoding !== "ISO-8859-1") {
+		// Only set if not QR code default
+		hints.set(EncodeHintType.CHARACTER_SET, encoding);
+	}
+	hints.set(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.fromString(ecLevel));
+
+	return codeWriter.write(content, sizeX, sizeY, hints);
+};
+
 function LeftPanel(props: {
-	setBarcode: (url: string, text: string) => void;
+	setBarcode: (svg: SVGSVGElement, text: string) => void;
 	invalidateBarcode: () => void;
 }) {
 	const [selectedGeneratorKey, setSelectedGeneratorKey] = useState(() => generators[0].key as GeneratorKey);
@@ -59,7 +80,7 @@ function LeftPanel(props: {
 
 	const generate = useCallback(() => {
 		selectedGeneratorRef.current?.submit();
-	},[selectedGeneratorRef]);
+	}, [selectedGeneratorRef]);
 
 	const setSelectedGeneratorKeyAndFocus: React.ChangeEventHandler<HTMLSelectElement> = useCallback(event => {
 		// updates the second row of the table with the content of the selected generator
@@ -150,8 +171,8 @@ function LeftPanel(props: {
 
 	const setRawText = useCallback((text: string) => {
 		setErrorMessage("");
-		// const url = getUrl(size, size, ecLevel, encoding, text);
-		// props.setBarcode(url, text);
+		const svg = createSvg(size, size, ecLevel, encoding, text);
+		props.setBarcode(svg, text);
 	}, [
 		size,
 		size,
