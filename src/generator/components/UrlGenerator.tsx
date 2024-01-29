@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, forwardRef, useEffect, useRef } from "react";
+import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
 import setForwardRef from "../lib/set-forward-ref";
 
@@ -22,19 +22,29 @@ const UrlGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
+	const submit = useCallback(() => {
+
+	}, [
+		props.onInvalid,
+		props.onSubmit
+	]);
+
+	const keyPressHandler = useCallback((event: KeyboardEvent) => {
+		if (event.charCode == ("\n").charCodeAt(0) || event.charCode == ("\r").charCodeAt(0)) {
+			submit();
+		}
+	}, [submit]);
+
 	useEffect(() => {
 		setForwardRef(forwardRef, {
-			submit() {
-
-			},
+			submit,
 			focus() {
 				focusRequested.current = true;
 			}
 		});
 	}, [
-		forwardRef,
-		props.onInvalid,
-		props.onSubmit
+		submit,
+		forwardRef
 	]);
 
 	useEffect(() => {
@@ -51,7 +61,7 @@ const UrlGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef
 					URL
 				</td>
 				<td className="secondColumn">
-					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" value="http://" />
+					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" value="http://" onKeyPress={keyPressHandler} />
 				</td>
 			</tr>
 		</tbody>
