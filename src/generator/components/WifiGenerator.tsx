@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
-import setForwardRef from "../lib/set-forward-ref";
+import forwardAnyRef, { SetRef } from "../hook/forward-any-ref";
 
 const validTextField = (input: string, name: string): string | true => {
 	if (input.includes("\n")) {
@@ -27,7 +27,7 @@ const validTextField = (input: string, name: string): string | true => {
 
 const parseTextField = (input: string): string => input.replace(/([\\:;])/g, (_, $1: string) => $1);
 
-const WifiGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
+const WifiGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
@@ -111,16 +111,14 @@ const WifiGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRe
 	}, [submit]);
 
 	useEffect(() => {
-		setForwardRef(forwardRef, {
+		setRef({
 			submit,
 			focus() {
 				focusRequested.current = true;
 			}
 		});
-	}, [
-		submit,
-		forwardRef
-	]);
+	}, [submit,
+		forwardRef]);
 
 	useEffect(() => {
 		if (focusRequested.current && focusTargetRef.current != null) {

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
-import setForwardRef from "../lib/set-forward-ref";
+import forwardAnyRef, { SetRef } from "../hook/forward-any-ref";
 
 const LON_REGEXP = /^[+\-]?\d+(?:\.\d+)?$/;
 const LAT_REGEXP = /^[+\-]?\d+(?:\.\d+)?$/;
 
-const GeoLocationGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
+const GeoLocationGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
@@ -107,16 +107,14 @@ const GeoLocationGenerator = forwardRef((props: GeneratorEvent, forwardRef: Forw
 	}, [submit]);
 
 	useEffect(() => {
-		setForwardRef(forwardRef, {
+		setRef({
 			submit,
 			focus() {
 				focusRequested.current = true;
 			}
 		});
-	}, [
-		submit,
-		forwardRef
-	]);
+	}, [submit,
+		forwardRef]);
 
 	useEffect(() => {
 		if (focusRequested.current && focusTargetRef.current != null) {
