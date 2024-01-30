@@ -14,18 +14,37 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef } from "react";
+import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
 import setForwardRef from "../lib/set-forward-ref";
+import { validateUrl } from "../lib/validators";
 
 const UrlGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
-	const submit = useCallback(() => {
+	const [url, setUrl] = useState("http://");
 
+	const innerValidateUrl = useCallback(() => {
+		const reason = validateUrl(url);
+
+		if (reason !== true) {
+			props.onInvalid(reason);
+			return false;
+		}
+
+		return true;
 	}, [
-		props.onInvalid,
+		url,
+		props.onInvalid
+	]);
+
+	const submit = useCallback(() => {
+		innerValidateUrl() &&
+			props.onSubmit(url);
+	}, [
+		url,
+		innerValidateUrl,
 		props.onSubmit
 	]);
 
@@ -61,7 +80,15 @@ const UrlGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef
 					URL
 				</td>
 				<td className="secondColumn">
-					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" value="http://" onKeyPress={keyPressHandler} />
+					<input
+						ref={focusTargetRef}
+						className="gwt-TextBox required"
+						type="text"
+						value={url}
+						onChange={event => setUrl(event.target.value)}
+						onBlur={innerValidateUrl}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 		</tbody>

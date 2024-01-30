@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, forwardRef, useEffect, useRef } from "react";
+import { ForwardedRef, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
 import setForwardRef from "../lib/set-forward-ref";
 
@@ -22,10 +22,27 @@ const TextGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRe
 	const focusTargetRef = useRef<HTMLTextAreaElement>(null);
 	const focusRequested = useRef(false);
 
+	const [text, setText] = useState("");
+
+	const innerValidateText = useCallback(() => {
+		{
+			if (text.length === 0) {
+				props.onInvalid("Text should be at least 1 character.");
+				return false;
+			}
+		}
+
+		return true;
+	}, [
+		text,
+		props.onInvalid
+	]);
+
 	useEffect(() => {
 		setForwardRef(forwardRef, {
 			submit() {
-
+				innerValidateText() &&
+				props.onSubmit(text);
 			},
 			focus() {
 				focusRequested.current = true;
@@ -33,7 +50,8 @@ const TextGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRe
 		});
 	}, [
 		forwardRef,
-		props.onInvalid,
+		text,
+		innerValidateText,
 		props.onSubmit
 	]);
 
@@ -51,7 +69,14 @@ const TextGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRe
 					Text content
 				</td>
 				<td className="secondColumn">
-					<textarea ref={focusTargetRef} className="gwt-TextArea required" rows={5} />
+					<textarea
+						ref={focusTargetRef}
+						className="gwt-TextArea required"
+						rows={5}
+						value={text}
+						onChange={event => setText(event.target.value)}
+						onBlur={innerValidateText}
+					/>
 				</td>
 			</tr>
 		</tbody>

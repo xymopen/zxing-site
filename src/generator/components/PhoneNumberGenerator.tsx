@@ -14,18 +14,46 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef } from "react";
+import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
 import setForwardRef from "../lib/set-forward-ref";
+import { validateNumber, filterNumber } from "../lib/validators";
 
 const PhoneNumberGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
-	const submit = useCallback(() => {
+	const [number, setNumber] = useState("");
 
+	const innerValidateNumber = useCallback(() => {
+		{
+			if (number.length === 0) {
+				props.onInvalid("Phone number must be present.");
+				return false;
+			}
+		}
+
+		{
+			const reason = validateNumber(filterNumber(number));
+
+			if (reason !== true) {
+				props.onInvalid(reason);
+				return false;
+			}
+		}
+
+		return true;
 	}, [
-		props.onInvalid,
+		number,
+		props.onInvalid
+	]);
+
+	const submit = useCallback(() => {
+		innerValidateNumber() &&
+			props.onSubmit(`tel:${number}`);
+	}, [
+		number,
+		innerValidateNumber,
 		props.onSubmit
 	]);
 
@@ -61,7 +89,15 @@ const PhoneNumberGenerator = forwardRef((props: GeneratorEvent, forwardRef: Forw
 					Phone number
 				</td>
 				<td className="secondColumn">
-					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" onKeyPress={keyPressHandler} />
+					<input
+						ref={focusTargetRef}
+						className="gwt-TextBox required"
+						type="text"
+						value={number}
+						onChange={event => setNumber(event.target.value)}
+						onBlur={innerValidateNumber}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 		</tbody>

@@ -14,18 +14,46 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef } from "react";
+import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
 import setForwardRef from "../lib/set-forward-ref";
+import { validateEmail } from "../lib/validators";
 
 const EmailGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
-	const submit = useCallback(() => {
+	const [email, setEmail] = useState("");
 
+	const innerValidateEmail = useCallback(() => {
+		{
+			if (email.length === 0) {
+				props.onInvalid("Email must be present.");
+				return false;
+			}
+		}
+
+		{
+			const reason = validateEmail(email);
+
+			if (reason !== true) {
+				props.onInvalid(reason);
+				return false;
+			}
+		}
+
+		return true;
 	}, [
-		props.onInvalid,
+		email,
+		props.onInvalid
+	]);
+
+	const submit = useCallback(() => {
+		innerValidateEmail() &&
+			props.onSubmit(`mailto:${email}`);
+	}, [
+		email,
+		innerValidateEmail,
 		props.onSubmit
 	]);
 
@@ -61,7 +89,15 @@ const EmailGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedR
 					Address
 				</td>
 				<td className="secondColumn">
-					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" onKeyPress={keyPressHandler} />
+					<input
+						ref={focusTargetRef}
+						className="gwt-TextBox required"
+						type="text"
+						value={email}
+						onChange={event => setEmail(event.target.value)}
+						onBlur={innerValidateEmail}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 		</tbody>

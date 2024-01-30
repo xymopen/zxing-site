@@ -14,18 +14,93 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef } from "react";
+import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
 import setForwardRef from "../lib/set-forward-ref";
+
+const validTextField = (input: string, name: string): string | true => {
+	if (input.includes("\n")) {
+		return `${name} field must not contain \\n characters.`;
+	}
+	return true;
+};
+
+const parseTextField = (input: string): string => input.replace(/([\\:;])/g, (_, $1: string) => $1);
 
 const WifiGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
-	const submit = useCallback(() => {
+	type NetworkType = "WEP" | "WPA" | "nopass";
+	const [ssid, setSsid] = useState("");
+	const [password, setPassword] = useState("");
+	const [networkType, setNetworkType] = useState<NetworkType>("WEP");
+	const [hidden, setHidden] = useState(false);
 
+	const innerValidateSsid = useCallback(() => {
+		{
+			if (ssid.length === 0) {
+				props.onInvalid("SSID must be at least 1 character.");
+				return false;
+			}
+		}
+
+		{
+			const reason = validTextField(ssid, "SSID");
+
+			if (reason !== true) {
+				props.onInvalid(reason);
+				return false;
+			}
+		}
+
+		return true;
 	}, [
-		props.onInvalid,
+		ssid,
+		props.onInvalid
+	]);
+
+	const innerValidatePassword = useCallback(() => {
+		const reason = validTextField(password, "Password");
+
+		if (reason !== true) {
+			props.onInvalid(reason);
+			return false;
+		}
+
+		return true;
+	}, [
+		password,
+		props.onInvalid
+	]);
+
+	const submit = useCallback(() => {
+		if (innerValidateSsid() && innerValidatePassword()) {
+			const parsedSsid = parseTextField(ssid);
+			const parsedPassword = parseTextField(password);
+
+			// Build the output with obtained data.
+			let output = "WIFI:";
+			output += `S:${parsedSsid};`;
+			if (networkType !== "nopass") {
+				output += `T:${networkType};`;
+			}
+			if (parsedPassword !== "") {
+				output += `P:${parsedPassword};`;
+			}
+			if (hidden) {
+				output += "H:true;";
+			}
+			output += ";";
+			props.onSubmit(output);
+		}
+	}, [
+		ssid,
+		password,
+		networkType,
+		hidden,
+		innerValidateSsid,
+		innerValidatePassword,
 		props.onSubmit
 	]);
 
@@ -61,7 +136,15 @@ const WifiGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRe
 					SSID
 				</td>
 				<td className="secondColumn">
-					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" onKeyPress={keyPressHandler} />
+					<input
+						ref={focusTargetRef}
+						className="gwt-TextBox required"
+						type="text"
+						value={ssid}
+						onChange={event => setSsid(event.target.value)}
+						onBlur={innerValidateSsid}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 			<tr>
@@ -69,7 +152,14 @@ const WifiGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRe
 					Password
 				</td>
 				<td className="secondColumn">
-					<input className="gwt-TextBox" type="text" onKeyPress={keyPressHandler} />
+					<input
+						className="gwt-TextBox"
+						type="text"
+						value={password}
+						onChange={event => setPassword(event.target.value)}
+						onBlur={innerValidatePassword}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 			<tr>
@@ -77,7 +167,11 @@ const WifiGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRe
 					Network Type
 				</td>
 				<td className="secondColumn">
-					<select className="gwt-ListBox">
+					<select
+						className="gwt-ListBox"
+						value={networkType}
+						onChange={event => setNetworkType(event.target.value as NetworkType)}
+					>
 						<option value="WEP">WEP</option>
 						<option value="WPA">WPA/WPA2</option>
 						<option value="nopass">No encryption</option>
@@ -89,7 +183,12 @@ const WifiGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRe
 					Hidden?
 				</td>
 				<td className="secondColumn">
-					<input className="gwt-CheckBox" type="checkbox" />
+					<input
+						className="gwt-CheckBox"
+						type="checkbox"
+						checked={hidden}
+						onChange={event => setHidden(event.target.checked)}
+					/>
 				</td>
 			</tr>
 		</tbody>

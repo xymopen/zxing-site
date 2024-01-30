@@ -14,18 +14,89 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef } from "react";
+import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
 import setForwardRef from "../lib/set-forward-ref";
+
+const LON_REGEXP = /^[+\-]?\d+(?:\.\d+)?$/;
+const LAT_REGEXP = /^[+\-]?\d+(?:\.\d+)?$/;
 
 const GeoLocationGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
-	const submit = useCallback(() => {
+	const [latitude, setLatitude] = useState("");
+	const [longitude, setLongitude] = useState("");
+	const [query, setQuery] = useState("");
 
+	const innerValidateLatitude = useCallback(() => {
+		{
+
+			if (!(LAT_REGEXP).test(latitude)) {
+				props.onInvalid("Latitude is not a correct value.");
+				return false;
+			}
+		}
+
+		{
+			const val = parseFloat(latitude);
+			if (val < -90 || val > 90) {
+				props.onInvalid("Latitude must be in [-90:90]");
+				return false;
+			}
+
+		}
+
+		return true;
 	}, [
-		props.onInvalid,
+		latitude,
+		props.onInvalid
+	]);
+
+	const innerValidateLongitude = useCallback(() => {
+		{
+
+			if (!(LON_REGEXP).test(longitude)) {
+				props.onInvalid("Longitude is not a correct value.");
+				return false;
+			}
+		}
+
+		{
+			const val = parseFloat(longitude);
+			if (val < -180 || val > 180) {
+				props.onInvalid("Longitude must be in [-180:180]");
+				return false;
+			}
+
+		}
+
+		return true;
+	}, [
+		longitude,
+		props.onInvalid
+	]);
+
+	const submit = useCallback(() => {
+		if (innerValidateLatitude() && innerValidateLongitude()) {
+			let lat = latitude;
+			let lon = longitude;
+
+			if (query.length > 0) {
+				const que = query.replace(/&/g, "%26");
+				const lat = latitude.length == 0 ? "0" : latitude;
+				const lon = longitude.length == 0 ? "0" : longitude;
+				props.onSubmit(`geo:${lat},${lon}?q=${que}`);
+			} else {
+				props.onSubmit(`geo:${lat},${lon}`);
+			}
+		}
+	}, [
+		latitude,
+		longitude,
+		query,
+		innerValidateLatitude,
+		innerValidateLongitude,
 		props.onSubmit
 	]);
 
@@ -61,7 +132,15 @@ const GeoLocationGenerator = forwardRef((props: GeneratorEvent, forwardRef: Forw
 					Latitude
 				</td>
 				<td className="secondColumn">
-					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" onKeyPress={keyPressHandler} />
+					<input
+						ref={focusTargetRef}
+						className="gwt-TextBox required"
+						type="text"
+						value={latitude}
+						onChange={event => setLatitude(event.target.value)}
+						onBlur={innerValidateLatitude}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 			<tr>
@@ -69,7 +148,14 @@ const GeoLocationGenerator = forwardRef((props: GeneratorEvent, forwardRef: Forw
 					Longitude
 				</td>
 				<td className="secondColumn">
-					<input className="gwt-TextBox required" type="text" onKeyPress={keyPressHandler} />
+					<input
+						className="gwt-TextBox required"
+						type="text"
+						value={longitude}
+						onChange={event => setLongitude(event.target.value)}
+						onBlur={innerValidateLongitude}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 			<tr>
@@ -77,7 +163,13 @@ const GeoLocationGenerator = forwardRef((props: GeneratorEvent, forwardRef: Forw
 					Query
 				</td>
 				<td className="secondColumn">
-					<input className="gwt-TextBox" type="text" onKeyPress={keyPressHandler} />
+					<input
+						className="gwt-TextBox"
+						type="text"
+						value={query}
+						onChange={event => setQuery(event.target.value)}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 		</tbody>

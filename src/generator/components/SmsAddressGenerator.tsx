@@ -14,18 +14,69 @@
  * limitations under the License.
  */
 
-import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef } from "react";
+import { ForwardedRef, KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
 import setForwardRef from "../lib/set-forward-ref";
+import { validateNumber, filterNumber } from "../lib/validators";
 
 const SmsAddressGenerator = forwardRef((props: GeneratorEvent, forwardRef: ForwardedRef<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
-	const submit = useCallback(() => {
+	const [number, setNumber] = useState("");
+	const [message, setMessage] = useState("");
 
+	const innerValidateNumber = useCallback(() => {
+		{
+			if (number.length === 0) {
+				props.onInvalid("Phone number must be present.");
+				return false;
+			}
+		}
+
+		{
+			const reason = validateNumber(filterNumber(number));
+
+			if (reason !== true) {
+				props.onInvalid(reason);
+				return false;
+			}
+		}
+
+		return true;
 	}, [
-		props.onInvalid,
+		number,
+		props.onInvalid
+	]);
+
+	const innerValidateMessage = useCallback(() => {
+		{
+			if (message.length > 150) {
+				props.onInvalid("Sms message can not be longer than 150 characters.");
+				return false;
+			}
+		}
+
+		return true;
+	}, [
+		message,
+		props.onInvalid
+	]);
+
+	const submit = useCallback(() => {
+		if (innerValidateNumber() && innerValidateMessage()) {
+			let output = number;
+			// we add the text only if there actually is something in the field.
+			if (message.length > 0) {
+				output += ":" + message;
+			}
+
+			props.onSubmit(`smsto:${output}`);
+		}
+	}, [
+		number,
+		message,
+		innerValidateNumber,
 		props.onSubmit
 	]);
 
@@ -61,7 +112,15 @@ const SmsAddressGenerator = forwardRef((props: GeneratorEvent, forwardRef: Forwa
 					Phone number
 				</td>
 				<td className="secondColumn">
-					<input ref={focusTargetRef} className="gwt-TextBox required" type="text" onKeyPress={keyPressHandler} />
+					<input
+						ref={focusTargetRef}
+						className="gwt-TextBox required"
+						type="text"
+						value={number}
+						onChange={event => setNumber(event.target.value)}
+						onBlur={innerValidateNumber}
+						onKeyPress={keyPressHandler}
+					/>
 				</td>
 			</tr>
 			<tr>
@@ -69,7 +128,12 @@ const SmsAddressGenerator = forwardRef((props: GeneratorEvent, forwardRef: Forwa
 					Message
 				</td>
 				<td className="secondColumn">
-					<textarea className="gwt-TextArea" />
+					<textarea
+						className="gwt-TextArea"
+						value={message}
+						onChange={event => setMessage(event.target.value)}
+						onBlur={innerValidateMessage}
+					/>
 				</td>
 			</tr>
 		</tbody>
