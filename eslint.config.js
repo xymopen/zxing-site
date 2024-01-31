@@ -148,6 +148,11 @@ export default [
 		rules: {
 			...typescript.configs["eslint-recommended"].rules,
 			...typescript.configs["recommended-type-checked"].rules,
+			"@typescript-eslint/no-unused-vars": [
+				"error", {
+					varsIgnorePattern: "^_"
+				}
+			]
 		}
 	},
 	{
