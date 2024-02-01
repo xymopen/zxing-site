@@ -1,4 +1,4 @@
-import { setDecodeResult, setErrorResponse } from "./render-components";
+import { setDecodeResult, setErrorResponse } from "./route";
 import { BinaryBitmap, DecodeHintType, Exception, GlobalHistogramBinarizer, HybridBinarizer, MultiFormatReader, NotFoundException, Result } from "@zxing/library";
 import { HTMLCanvasElementLuminanceSource } from "@zxing/browser";
 

@@ -10,7 +10,13 @@
 	<body>
 		<noscript>You need to enable JavaScript to run this app.</noscript>
 		<div id="main"></div>
-		<script type="module" src="./index.tsx"></script>
+		<script type="module">
+			import { setRoute } from "./lib/route";
+
+			setRoute();
+
+			window.addEventListener("popstate", setRoute);
+		</script>
 	</body>
 
 </html>
