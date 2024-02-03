@@ -1,6 +1,7 @@
 import { setDecodeResult, setErrorResponse } from "./route";
 import { BinaryBitmap, DecodeHintType, Exception, GlobalHistogramBinarizer, HybridBinarizer, MultiFormatReader, NotFoundException, Result } from "@zxing/library";
 import { HTMLCanvasElementLuminanceSource } from "@zxing/browser";
+import GenericMultipleBarcodeReader from "./multi/GenericMultipleBarcodeReader";
 
 const mapOf = <K extends PropertyKey, V>(literal: Record<K, V>): Map<K, V> =>
 	new Map(Object.entries(literal) as [K, V][]);
@@ -40,7 +41,21 @@ const processImage = (canvas: HTMLCanvasElement) => {
 	const reader = new MultiFormatReader();
 	let savedException: unknown = null;
 
-	// TODO: Unlike the Java implement, we don't have a GenericMultipleBarcodeReader
+	{
+		try {
+			// Look for multiple barcodes
+			const multiReader = new GenericMultipleBarcodeReader(reader);
+			const theResults = multiReader.decodeMultiple(bitmap, mapOf({
+				[DecodeHintType.TRY_HARDER]: true,
+				[DecodeHintType.POSSIBLE_FORMATS]: true,
+			}));
+			if (theResults != null) {
+				results.push(...theResults);
+			}
+		} catch (re) {
+			savedException = re;
+		}
+	}
 
 	if (results.length === 0) {
 		try {
