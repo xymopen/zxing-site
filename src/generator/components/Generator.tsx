@@ -16,6 +16,25 @@
 
 import { useCallback, useState } from "react";
 import LeftPanel from "./LeftPanel";
+import loadImageElement from "../../lib/load-image";
+import download from "../../lib/download";
+
+const getPngUrlFromSvg = async (svg: SVGSVGElement) => {
+	const svgData = new Blob([new XMLSerializer().serializeToString(svg)], { type: "image/svg+xml" });
+	const svgUrl = URL.createObjectURL(svgData);
+
+	try {
+		const img = await loadImageElement(svgUrl);
+		const canvas = document.createElement("canvas");
+		canvas.width = img.width;
+		canvas.height = img.height;
+		const ctx = canvas.getContext("2d")!;
+		ctx.drawImage(img, 0, 0);
+		return canvas.toDataURL();
+	} finally {
+		URL.revokeObjectURL(svgUrl);
+	}
+};
 
 function Generator() {
 	const [svg, setSvg] = useState<SVGSVGElement | null>(null);
@@ -37,9 +56,21 @@ function Generator() {
 		style={rawTextResultVisible ? {} : { display: "none" }}
 	/>;
 
+	const downloadQrcode = useCallback(async () => {
+		if (svg != null) {
+			download(await getPngUrlFromSvg(svg), "chart.png");
+		}
+	}, [svg]);
+
+	const downloadQrcodeVoid = useCallback(() => void downloadQrcode(), [downloadQrcode]);
+
+	const downloadText = <div id="downloadText" className="gwt-HTML" style={rawTextResultVisible ? {} : { display: "none" }}>
+		<a href="javascript:void(0)" id="downloadlink" onClick={downloadQrcodeVoid}>Download</a>
+	</div>;
 	const rightPanel = <table>
 		<tbody>
 			<tr><td align="left" style={{ verticalAlign: "top" }}>{div}</td></tr>
+			<tr><td align="left" style={{ verticalAlign: "top" }}>{downloadText}</td></tr>
 			<tr><td align="left" style={{ verticalAlign: "top" }}>{rawTextResult}</td></tr>
 		</tbody>
 	</table>;
