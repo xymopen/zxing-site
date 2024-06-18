@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import { KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, Ref, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
-import forwardAnyRef, { SetRef } from "../hook/forward-any-ref";
 import { validateEmail } from "../lib/validators";
 
-const EmailGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<GeneratorRef>) => {
+const EmailGenerator = forwardRef((props: GeneratorEvent, ref: Ref<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
@@ -63,14 +62,14 @@ const EmailGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<Gene
 		}
 	}, [submit]);
 
-	useEffect(() => {
-		setRef({
+	useImperativeHandle(ref, () =>
+		({
 			submit,
 			focus() {
 				focusRequested.current = true;
 			}
-		});
-	}, [submit,
+		})
+	, [submit,
 		forwardRef]);
 
 	useEffect(() => {

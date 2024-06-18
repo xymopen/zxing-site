@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { Ref, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
-import forwardAnyRef, { SetRef } from "../hook/forward-any-ref";
 
-const TextGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<GeneratorRef>) => {
+const TextGenerator = forwardRef((props: GeneratorEvent, ref: Ref<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLTextAreaElement>(null);
 	const focusRequested = useRef(false);
 
@@ -38,8 +37,8 @@ const TextGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<Gener
 		props.onInvalid
 	]);
 
-	useEffect(() => {
-		setRef({
+	useImperativeHandle(ref, () =>
+		({
 			submit() {
 				innerValidateText() &&
 					props.onSubmit(text);
@@ -47,8 +46,8 @@ const TextGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<Gener
 			focus() {
 				focusRequested.current = true;
 			}
-		});
-	}, [forwardRef,
+		})
+	, [forwardRef,
 		text,
 		innerValidateText,
 		props.onSubmit]);

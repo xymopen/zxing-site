@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { KeyboardEvent, forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, Ref, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { GeneratorEvent, GeneratorRef } from "../types/generator-types";
-import forwardAnyRef, { SetRef } from "../hook/forward-any-ref";
 
 const validTextField = (input: string, name: string): string | true => {
 	if (input.includes("\n")) {
@@ -27,7 +26,7 @@ const validTextField = (input: string, name: string): string | true => {
 
 const parseTextField = (input: string): string => input.replace(/([\\:;])/g, (_, $1: string) => $1);
 
-const WifiGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<GeneratorRef>) => {
+const WifiGenerator = forwardRef((props: GeneratorEvent, ref: Ref<GeneratorRef>) => {
 	const focusTargetRef = useRef<HTMLInputElement>(null);
 	const focusRequested = useRef(false);
 
@@ -110,14 +109,14 @@ const WifiGenerator = forwardAnyRef((props: GeneratorEvent, setRef: SetRef<Gener
 		}
 	}, [submit]);
 
-	useEffect(() => {
-		setRef({
+	useImperativeHandle(ref, () =>
+		({
 			submit,
 			focus() {
 				focusRequested.current = true;
 			}
-		});
-	}, [submit,
+		})
+	, [submit,
 		forwardRef]);
 
 	useEffect(() => {
