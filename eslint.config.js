@@ -2,17 +2,15 @@
 import globals from "globals";
 import js from "@eslint/js";
 import stylistic from "@stylistic/eslint-plugin";
-import typescript from "@typescript-eslint/eslint-plugin";
-import typescriptParser from "@typescript-eslint/parser";
+import tseslint from "typescript-eslint";
 import html from "@html-eslint/eslint-plugin";
-import htmlParser from "@html-eslint/parser";
 import react from "eslint-plugin-react";
 import reactRecommended from "eslint-plugin-react/configs/recommended.js";
 import reactJsxRuntime from "eslint-plugin-react/configs/jsx-runtime.js";
 import hooks from "eslint-plugin-react-hooks";
 import refresh from "eslint-plugin-react-refresh";
 
-/** @type {import('eslint').Linter.FlatConfig[]} */
+/** @type {import('eslint').Linter.Config[]} */
 export default [
 	{
 		ignores: [
@@ -32,13 +30,7 @@ export default [
 			".pnp.*"
 		],
 		languageOptions: {
-			ecmaVersion: 2020,
-			sourceType: "module",
-			parserOptions: {
-				ecmaFeatures: {
-					jsx: true
-				}
-			}
+			sourceType: "module"
 		},
 		plugins: {
 			"@stylistic": stylistic
@@ -73,24 +65,32 @@ export default [
 		files: [
 			"src/**/*.js",
 			"src/**/*.mjs",
-			"src/**/*.cjs",
 			"src/**/*.jsx",
 			"src/**/*.ts",
 			"src/**/*.mts",
-			"src/**/*.cts",
 			"src/**/*.tsx"
 		],
 		...reactRecommended,
 		...reactJsxRuntime,
 		...hooks.configs.recommended,
 		languageOptions: {
+			ecmaVersion: 2020,
+			parserOptions: {
+				ecmaFeatures: {
+					jsx: true
+				}
+			},
 			globals: globals.browser
 		},
 		plugins: {
 			react,
+			'react-hooks': hooks,
 			"react-refresh": refresh
 		},
 		rules: {
+			...reactRecommended.rules,
+			...reactJsxRuntime.rules,
+			...hooks.configs.recommended.rules,
 			"react/jsx-no-target-blank": "off",
 			"react-refresh/only-export-components": [
 				"warn",
@@ -109,65 +109,54 @@ export default [
 		files: [
 			"*.js",
 			"*.mjs",
-			"*.cjs",
 			"*.ts",
 			"*.mts",
-			"*.cts"
 		],
 		languageOptions: {
-			globals: globals.node
+			ecmaVersion: 2022,
+			globals: globals.nodeBuiltin
 		}
 	},
 	{
 		files: [
 			"**/*.js",
 			"**/*.mjs",
-			"**/*.cjs",
 			"**/*.jsx"
 		],
 		...js.configs.recommended
 	},
-	{
+	...tseslint.config({
 		files: [
 			"**/*.ts",
 			"**/*.mts",
-			"**/*.cts",
 			"**/*.tsx"
 		],
+		extends: [
+			...tseslint.configs.recommended,
+			tseslint.configs.eslintRecommended,
+			...tseslint.configs.recommendedTypeChecked
+		],
 		languageOptions: {
-			parser: typescriptParser,
-			/** @type {import('@typescript-eslint/parser/dist/index').ParserOptions} */
 			parserOptions: {
-				project: "./tsconfig.json",
-				tsconfigRootDir: import.meta.dirname
+				projectService: true
 			}
 		},
-		plugins: {
-			"@typescript-eslint": typescript
-		},
 		rules: {
-			...typescript.configs["eslint-recommended"].rules,
-			...typescript.configs["recommended-type-checked"].rules,
 			"@typescript-eslint/no-unused-vars": [
 				"error", {
 					varsIgnorePattern: "^_"
 				}
 			]
 		}
-	},
+	}),
 	{
 		files: [
 			"**/*.htm",
 			"**/*.html"
 		],
-		...html.configs.recommended,
-		languageOptions: {
-			parser: htmlParser
-		},
-		plugins: {
-			"@html-eslint": html
-		},
+		...html.configs["flat/recommended"],
 		rules: {
+			...html.configs["flat/recommended"].rules,
 			"@html-eslint/require-lang": "off",
 			"@html-eslint/indent": [
 				"error",
@@ -176,8 +165,7 @@ export default [
 			"@html-eslint/require-closing-tags": [
 				"error",
 				{
-					selfClosing: "always",
-					allowSelfClosingCustom: false
+					selfClosing: "always"
 				}
 			],
 			"@html-eslint/quotes": [
