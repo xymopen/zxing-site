@@ -1,34 +1,31 @@
 // @ts-nocheck
 import globals from "globals";
 import js from "@eslint/js";
+import { defineConfig, globalIgnores } from 'eslint/config'
 import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "typescript-eslint";
 import html from "@html-eslint/eslint-plugin";
-import react from "eslint-plugin-react";
-import reactRecommended from "eslint-plugin-react/configs/recommended.js";
-import reactJsxRuntime from "eslint-plugin-react/configs/jsx-runtime.js";
 import hooks from "eslint-plugin-react-hooks";
 import refresh from "eslint-plugin-react-refresh";
 
-/** @type {import('eslint').Linter.Config[]} */
-export default [
+export default defineConfig([
+	globalIgnores([
+		"logs",
+		"pids",
+		"lib-cov",
+		"coverage",
+		".nyc_output",
+		"build/Release",
+		"node_modules/",
+		".npm",
+		".eslintcache",
+		".vite/",
+		"dist/",
+		".yarn/cache",
+		".yarn/unplugged",
+		".pnp.*"
+	]),
 	{
-		ignores: [
-			"logs",
-			"pids",
-			"lib-cov",
-			"coverage",
-			".nyc_output",
-			"build/Release",
-			"node_modules/",
-			".npm",
-			".eslintcache",
-			".vite/",
-			"dist/",
-			".yarn/cache",
-			".yarn/unplugged",
-			".pnp.*"
-		],
 		languageOptions: {
 			sourceType: "module"
 		},
@@ -70,9 +67,10 @@ export default [
 			"src/**/*.mts",
 			"src/**/*.tsx"
 		],
-		...reactRecommended,
-		...reactJsxRuntime,
-		...hooks.configs.recommended,
+		extends: [
+			hooks.configs.flat.recommended,
+			refresh.configs.vite,
+		],
 		languageOptions: {
 			ecmaVersion: 2020,
 			parserOptions: {
@@ -82,15 +80,7 @@ export default [
 			},
 			globals: globals.browser
 		},
-		plugins: {
-			react,
-			'react-hooks': hooks,
-			"react-refresh": refresh
-		},
 		rules: {
-			...reactRecommended.rules,
-			...reactJsxRuntime.rules,
-			...hooks.configs.recommended.rules,
 			"react/jsx-no-target-blank": "off",
 			"react-refresh/only-export-components": [
 				"warn",
@@ -123,18 +113,18 @@ export default [
 			"**/*.mjs",
 			"**/*.jsx"
 		],
-		...js.configs.recommended
+		extends: [
+			js.configs.recommended
+		]
 	},
-	...tseslint.config({
+	{
 		files: [
 			"**/*.ts",
 			"**/*.mts",
 			"**/*.tsx"
 		],
 		extends: [
-			...tseslint.configs.recommended,
-			tseslint.configs.eslintRecommended,
-			...tseslint.configs.recommendedTypeChecked
+			tseslint.configs.recommended
 		],
 		languageOptions: {
 			parserOptions: {
@@ -148,15 +138,16 @@ export default [
 				}
 			]
 		}
-	}),
+	},
 	{
 		files: [
 			"**/*.htm",
 			"**/*.html"
 		],
-		...html.configs["flat/recommended"],
+		extends: [
+			html.configs["flat/recommended"]
+		],
 		rules: {
-			...html.configs["flat/recommended"].rules,
 			"@html-eslint/require-lang": "off",
 			"@html-eslint/indent": [
 				"error",
@@ -181,4 +172,4 @@ export default [
 			]
 		}
 	}
-];
+]);
